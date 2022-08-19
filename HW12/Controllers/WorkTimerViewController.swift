@@ -23,6 +23,11 @@ class WorkTimerViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    var isStarted = false
+    var isWorkTime = true
+    var timer = Timer()
+    var workTime = 10
+    var freeTime = 5
     
 //MARK: - Lifecycle
 
@@ -35,6 +40,7 @@ class WorkTimerViewController: UIViewController {
 //MARK: - Setup
     private func setViews() {
         view.backgroundColor = .white
+        timerLabel.text = "\(workTime)"
         view.addSubview(timerLabel)
         view.addSubview(timerButton)
     }
@@ -42,10 +48,39 @@ class WorkTimerViewController: UIViewController {
 
 //MARK: - Action
     @objc func timerButtonTapped() {
+
         if timerButton.currentImage == UIImage(systemName: "play.fill") {
             timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
         } else {
             timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+            timer.invalidate()
+        }
+    }
+    @objc func timerAction() {
+        
+        if isWorkTime {
+            workTime -= 1
+            timerLabel.text = "\(workTime)"
+            if workTime == 0 {
+                timer.invalidate()
+                timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+                workTime = 6
+                timerLabel.text = "\(freeTime)"
+                isWorkTime = false
+                print(isWorkTime)
+            }
+        } else {
+            freeTime -= 1
+            timerLabel.text = "\(freeTime)"
+            if freeTime == 0 {
+                timer.invalidate()
+                timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+                freeTime = 5
+                timerLabel.text = "\(workTime)"
+                isWorkTime = true
+                print(isWorkTime)
+            }
         }
     }
 
