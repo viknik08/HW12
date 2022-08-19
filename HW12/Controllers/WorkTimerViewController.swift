@@ -23,21 +23,44 @@ class WorkTimerViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
 //MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setViews()
+        setConstraint()
     }
     
 //MARK: - Setup
+    private func setViews() {
+        view.backgroundColor = .white
+        view.addSubview(timerLabel)
+        view.addSubview(timerButton)
+    }
     
 
 //MARK: - Action
     @objc func timerButtonTapped() {
-        timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-
+        if timerButton.currentImage == UIImage(systemName: "play.fill") {
+            timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+        } else {
+            timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        }
     }
 
+}
+//MARK: - Constraints
+extension WorkTimerViewController {
+    private func setConstraint() {
+        NSLayoutConstraint.activate([
+            timerLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            timerLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            timerButton.topAnchor.constraint(equalTo: timerLabel.bottomAnchor, constant: 20),
+            timerButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+    }
 }
 
 
