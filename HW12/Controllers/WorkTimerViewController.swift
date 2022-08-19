@@ -17,13 +17,15 @@ class WorkTimerViewController: UIViewController {
     private let timerLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 50)
-        label.text = "1"
+        label.textColor = .red
+        label.text = ""
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     private let timerButton: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "play.fill"), for: .normal)
+        button.tintColor = .black
         button.addTarget(self, action: #selector(timerButtonTapped), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -38,7 +40,7 @@ class WorkTimerViewController: UIViewController {
 //MARK: - Lifecycle
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        animationProgressBar()
+        self.animationProgressBar()
     }
 
     override func viewDidLoad() {
@@ -59,7 +61,8 @@ class WorkTimerViewController: UIViewController {
 
 //MARK: - Action
     @objc func timerButtonTapped() {
-
+        basicAnimation()
+        
         if timerButton.currentImage == UIImage(systemName: "play.fill") {
             timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
@@ -78,6 +81,7 @@ class WorkTimerViewController: UIViewController {
                 timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
                 workTime = 10
                 timerLabel.text = "\(freeTime)"
+                timerLabel.textColor = .green
                 isWorkTime = false
                 print(isWorkTime)
             }
@@ -89,6 +93,7 @@ class WorkTimerViewController: UIViewController {
                 timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
                 freeTime = 5
                 timerLabel.text = "\(workTime)"
+                timerLabel.textColor = .red
                 isWorkTime = true
                 print(isWorkTime)
             }
@@ -114,8 +119,19 @@ class WorkTimerViewController: UIViewController {
         shapeLayer.fillColor = UIColor.clear.cgColor
         shapeLayer.strokeEnd = 1
         shapeLayer.lineCap = CAShapeLayerLineCap.round
-        shapeLayer.strokeColor = UIColor.red.cgColor
+        shapeLayer.strokeColor = isWorkTime ? UIColor.red.cgColor : UIColor.green.cgColor
         timerView.layer.addSublayer(shapeLayer)
+    }
+    
+    private func basicAnimation() {
+        
+        let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
+
+        basicAnimation.duration = isWorkTime ? CFTimeInterval(workTime) : CFTimeInterval(freeTime)
+        basicAnimation.toValue = 0
+        basicAnimation.fillMode = CAMediaTimingFillMode.forwards
+        basicAnimation.isRemovedOnCompletion = false
+        shapeLayer.add(basicAnimation, forKey: "basicAnimation")
     }
 
 }
