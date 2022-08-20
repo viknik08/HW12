@@ -7,7 +7,7 @@
 
 import UIKit
 
-class WorkTimerViewController: UIViewController {
+final class WorkTimerViewController: UIViewController {
 //MARK: - Outlets
     private let timerView: UIView = {
         let view = UIView()
@@ -33,14 +33,16 @@ class WorkTimerViewController: UIViewController {
     var isStarted = false
     var isWorkTime = true
     var timer = Timer()
-    var workTime = 10
-    var freeTime = 5
+    var workTime = 25
+    var freeTime = 10
     var shapeLayer = CAShapeLayer()
+    var backShapeLayer = CAShapeLayer()
     
 //MARK: - Lifecycle
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        self.animationProgressBar()
+        backProgressBar()
+        animationProgressBar()
     }
 
     override func viewDidLoad() {
@@ -58,21 +60,28 @@ class WorkTimerViewController: UIViewController {
         timerView.addSubview(timerButton)
     }
     
-
 //MARK: - Action
     @objc func timerButtonTapped() {
-        basicAnimation()
-        
         if timerButton.currentImage == UIImage(systemName: "play.fill") {
-            timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-            timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+            if isStarted {
+                resumeAnimation()
+                timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+                timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+                isStarted = false
+            } else {
+                basicAnimation()
+                timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+                timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+            }
         } else {
+            isStarted = true
             timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
             timer.invalidate()
+            pauseAnimation()
         }
     }
+    
     @objc func timerAction() {
-        
         if isWorkTime {
             workTime -= 1
             timerLabel.text = "\(workTime)"
@@ -101,13 +110,31 @@ class WorkTimerViewController: UIViewController {
     }
     
 //MARK: - Animation
+    private func backProgressBar() {
+        
+        let center = CGPoint(x: timerView.frame.width / 2, y: timerView.frame.height / 2)
+        let end = (-CGFloat.pi / 2)
+        let start = 2 * CGFloat.pi + end
+        let circularPath = UIBezierPath(arcCenter: center,
+                                        radius: 138,
+                                        startAngle: start,
+                                        endAngle: end,
+                                        clockwise: false)
+        
+        backShapeLayer.path = circularPath.cgPath
+        backShapeLayer.lineWidth = 15
+        backShapeLayer.fillColor = UIColor.clear.cgColor
+        backShapeLayer.strokeEnd = 1
+        backShapeLayer.lineCap = CAShapeLayerLineCap.round
+        backShapeLayer.strokeColor = UIColor.gray.cgColor
+        timerView.layer.addSublayer(backShapeLayer)
+    }
     
     private func animationProgressBar() {
         
         let center = CGPoint(x: timerView.frame.width / 2, y: timerView.frame.height / 2)
         let end = (-CGFloat.pi / 2)
         let start = 2 * CGFloat.pi + end
-        
         let circularPath = UIBezierPath(arcCenter: center,
                                         radius: 138,
                                         startAngle: start,
@@ -124,16 +151,28 @@ class WorkTimerViewController: UIViewController {
     }
     
     private func basicAnimation() {
-        
         let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
-
         basicAnimation.duration = isWorkTime ? CFTimeInterval(workTime) : CFTimeInterval(freeTime)
         basicAnimation.toValue = 0
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
-        basicAnimation.isRemovedOnCompletion = false
+        basicAnimation.isRemovedOnCompletion = true
         shapeLayer.add(basicAnimation, forKey: "basicAnimation")
     }
-
+    
+    private func pauseAnimation(){
+        let pausedTime = shapeLayer.convertTime(CACurrentMediaTime(), from: nil)
+        shapeLayer.speed = 0.0
+        shapeLayer.timeOffset = pausedTime
+    }
+    
+    private func resumeAnimation(){
+        let pausedTime = shapeLayer.timeOffset
+        shapeLayer.speed = 1.0
+        shapeLayer.timeOffset = 0.0
+        shapeLayer.beginTime = 0.0
+        let timeSincePause = shapeLayer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
+        shapeLayer.beginTime = timeSincePause
+    }
 }
 //MARK: - Constraints
 extension WorkTimerViewController {
