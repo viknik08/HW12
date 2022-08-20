@@ -66,12 +66,12 @@ final class WorkTimerViewController: UIViewController {
             if isStarted {
                 resumeAnimation()
                 timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-                timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+                timer = Timer.scheduledTimer(timeInterval: 0.98, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
                 isStarted = false
             } else {
                 basicAnimation()
                 timerButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-                timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
+                timer = Timer.scheduledTimer(timeInterval: 0.98, target: self, selector: #selector(timerAction), userInfo: nil, repeats: true)
             }
         } else {
             isStarted = true
@@ -154,6 +154,7 @@ final class WorkTimerViewController: UIViewController {
         let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
         basicAnimation.duration = isWorkTime ? CFTimeInterval(workTime) : CFTimeInterval(freeTime)
         basicAnimation.toValue = 0
+        basicAnimation.speed = 1.0
         basicAnimation.fillMode = CAMediaTimingFillMode.forwards
         basicAnimation.isRemovedOnCompletion = true
         shapeLayer.add(basicAnimation, forKey: "basicAnimation")
