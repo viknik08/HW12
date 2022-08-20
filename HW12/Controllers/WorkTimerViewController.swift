@@ -88,7 +88,7 @@ final class WorkTimerViewController: UIViewController {
             if workTime == 0 {
                 timer.invalidate()
                 timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-                workTime = 10
+                workTime = 25
                 timerLabel.text = "\(freeTime)"
                 timerLabel.textColor = .green
                 isWorkTime = false
@@ -100,7 +100,7 @@ final class WorkTimerViewController: UIViewController {
             if freeTime == 0 {
                 timer.invalidate()
                 timerButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-                freeTime = 5
+                freeTime = 10
                 timerLabel.text = "\(workTime)"
                 timerLabel.textColor = .red
                 isWorkTime = true
